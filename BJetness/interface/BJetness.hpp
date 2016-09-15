@@ -107,7 +107,7 @@ class BJetness{
    public:
   void get_bjetness_vars(
 			 std::vector<pat::Jet> evtjets, const reco::Vertex& vtx, const TransientTrackBuilder& ttrkbuilder, edm::Handle<edm::View<pat::Electron> > electron_pat, edm::Handle<edm::View<pat::Muon> > muon_h,
-			 double& bjetnessFV_num_loosenoipnoiso_leps, double& bjetnessFV_numjettrksnopv, double& bjetnessFV_pvTrkOVcollTrk, double& bjetnessFV_avip3d_val, double& bjetnessFV_avip3d_sig, double& bjetnessFV_avsip3d_sig, double& bjetnessFV_avip1d_sig
+			 double& bjetnessFV_num_loosenoipnoiso_leps, double& bjetnessFV_pvTrkOVcollTrk, double& bjetnessFV_avip3d_val, double& bjetnessFV_avip3d_sig, double& bjetnessFV_avsip3d_sig, double& bjetnessFV_avip1d_sig
 			 );
  private:
 
@@ -115,6 +115,8 @@ class BJetness{
   bool is_goodtrk(reco::Track trk,const reco::Vertex& vtx);
   bool is_loosePOG_jetmuon(const pat::PackedCandidate &jcand, edm::Handle<edm::View<pat::Muon> > muon_h);
   bool is_loosePOGNoIPNoIso_jetelectron(const pat::PackedCandidate &jcand, edm::Handle<edm::View<pat::Electron> > electron_pat, const reco::Vertex& vtx);
+  bool is_softLep_jetelectron(const pat::PackedCandidate &jcand, edm::Handle<edm::View<pat::Electron> > electron_pat, const reco::Vertex& vtx);
+
   void get_avip3d(std::vector<reco::Track> trks, const TransientTrackBuilder& ttrkbuilder, reco::Vertex vtx, std::vector<std::tuple<double, double, double> >& jetsdir, double& jetchtrks_avip3d_val, double& jetchtrks_avip3d_sig, double& jetchtrks_avsip3d_sig);
   void get_avip1d(std::vector<reco::Track> trks, const TransientTrackBuilder& ttrkbuilder, reco::Vertex vtx, std::vector<std::tuple<double, double, double> >& jetsdir, double& jetchtrks_avip1d_sig);
     std::vector<TransientTrack> get_ttrks(std::vector<reco::Track> trks, const TransientTrackBuilder& ttrkbuilder);

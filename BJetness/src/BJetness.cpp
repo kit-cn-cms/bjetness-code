@@ -4,7 +4,7 @@
 /////
 void BJetness::get_bjetness_vars(
                                            vector<pat::Jet> evtjets, const reco::Vertex& vtx, const TransientTrackBuilder& ttrkbuilder, edm::Handle<edm::View<pat::Electron> > electron_pat, edm::Handle<edm::View<pat::Muon> > muon_h,
-                                           double& bjetnessFV_num_loosenoipnoiso_leps, double& bjetnessFV_numjettrksnopv, double& bjetnessFV_pvTrkOVcollTrk, double& bjetnessFV_avip3d_val, double& bjetnessFV_avip3d_sig, double& bjetnessFV_avsip3d_sig, double& bjetnessFV_avip1d_sig
+                                           double& bjetnessFV_num_loosenoipnoiso_leps, double& bjetnessFV_pvTrkOVcollTrk, double& bjetnessFV_avip3d_val, double& bjetnessFV_avip3d_sig, double& bjetnessFV_avsip3d_sig, double& bjetnessFV_avip1d_sig
                                           ){
   //Get BJetness trk info
   vector<Track> jetschtrks; jetschtrks.clear(); 
@@ -15,7 +15,7 @@ void BJetness::get_bjetness_vars(
   vector<tuple<double, double, double> > jetsdir; jetsdir.clear(); 
   get_bjetness_trkinfos(evtjets, vtx, jetschtrks, num_pvtrks, num_npvtrks, electron_pat, muon_h, num_loosenoipnoiso_eles, num_loose_mus, jetsdir);
   bjetnessFV_num_loosenoipnoiso_leps = num_loosenoipnoiso_eles+num_loose_mus;
-  bjetnessFV_numjettrksnopv          = num_npvtrks;
+//   bjetnessFV_numjettrksnopv          = num_npvtrks;
   if(jetschtrks.size()!=0){
     bjetnessFV_pvTrkOVcollTrk        = num_pvtrks/double(jetschtrks.size()); 
     //Get BJetness Impact Parameters
@@ -69,7 +69,8 @@ void BJetness::get_bjetness_trkinfos(vector<pat::Jet> evtjets, const reco::Verte
         if(jcand.fromPV()==2) bjetness_num_npvtrks++;
         jetsdir.push_back(make_tuple(jet.px(),jet.py(),jet.pz()));
         if(fabs(jcand.pdgId())==13 && is_loosePOG_jetmuon(jcand,muon_h)) bjetness_num_loose_mus++;
-        if(fabs(jcand.pdgId())==11 && is_loosePOGNoIPNoIso_jetelectron(jcand,electron_pat,vtx)) bjetness_num_loosenoipnoiso_eles++;
+        if(fabs(jcand.pdgId())==11 && is_softLep_jetelectron(jcand,electron_pat,vtx)) bjetness_num_loosenoipnoiso_eles++;
+// 	if(fabs(jcand.pdgId())==11 && is_loosePOGNoIPNoIso_jetelectron(jcand,electron_pat,vtx)) bjetness_num_loosenoipnoiso_eles++;
       }//Ch trks 
     }//Loop on jet daus 
   }//Loop on evt jet
@@ -97,7 +98,24 @@ bool BJetness::is_loosePOG_jetmuon(const pat::PackedCandidate &jcand, edm::Handl
   }  
   return ismu;
 }
+
+
 //Look for loose electron ((definition to look for candidates among jet daughters)
+bool BJetness::is_softLep_jetelectron(const pat::PackedCandidate &jcand, edm::Handle<edm::View<pat::Electron> > electron_pat, const reco::Vertex& vtx){
+  bool isele = false;
+  for(edm::View<pat::Electron>::const_iterator ele = electron_pat->begin(); ele != electron_pat->end(); ele++){
+    const pat::Electron &lele = *ele;
+    if(deltaR(jcand.p4(),lele.p4())<0.1 && fabs(jcand.pt()-lele.pt())/lele.pt()<0.05 ){
+      const HitPattern &hitPattern = lele.gsfTrack().get()->hitPattern();
+      uint32_t hit = hitPattern.getHitPattern(HitPattern::TRACK_HITS, 0);
+      bool hitCondition = !(HitPattern::validHitFilter(hit) && ((HitPattern::pixelBarrelHitFilter(hit) && HitPattern::getLayer(hit) < 3) || HitPattern::pixelEndcapHitFilter(hit)));
+      if(!hitCondition && lele.passConversionVeto()) isele = true;
+      if(isele) break;
+    }
+  }
+  return isele;
+}
+
 bool BJetness::is_loosePOGNoIPNoIso_jetelectron(const pat::PackedCandidate &jcand, edm::Handle<edm::View<pat::Electron> > electron_pat, const reco::Vertex& vtx){
   bool isele = false;
   for(edm::View<pat::Electron>::const_iterator ele = electron_pat->begin(); ele != electron_pat->end(); ele++){
