@@ -51,6 +51,8 @@ void BJetness::get_bjetness_vars(
 //Get the BJetness trk info 
 void BJetness::get_bjetness_trkinfos(vector<pat::Jet> evtjets, const reco::Vertex& vtx, vector<Track>& jetchtrks, double& bjetness_num_pvtrks, double& bjetness_num_npvtrks, edm::Handle<edm::View<pat::Electron> > electron_pat, edm::Handle<edm::View<pat::Muon> > muon_h, double& bjetness_num_loosenoipnoiso_eles, double& bjetness_num_loose_mus, vector<tuple<double, double, double> >& jetsdir){
   //Loop over evt jet
+  std::cout<<" track info "<<std::endl;
+  std::cout<<" njets "<<evtjets.size()<<std::endl;
   for(uint j=0; j<evtjets.size(); j++){
     pat::Jet jet = evtjets[j];
     //Access jet daughters
@@ -63,6 +65,8 @@ void BJetness::get_bjetness_trkinfos(vector<pat::Jet> evtjets, const reco::Verte
       Track trk = Track(jcand.pseudoTrack());
       bool isgoodtrk = is_goodtrk(trk,vtx);
       //Minimal conditions for a BJetness jet constituent 
+      std::cout<<"conditioons for good track"<<std::endl;
+      std::cout<<isgoodtrk<<" "<<jcand.charge()<<" "<<jcand.fromPV()<<std::endl;
       if(isgoodtrk && jcand.charge()!=0 && jcand.fromPV()>1){
         jetchtrks.push_back(trk);
         if(jcand.fromPV()==3) bjetness_num_pvtrks++;
