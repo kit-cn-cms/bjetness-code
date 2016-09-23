@@ -17,7 +17,7 @@ void BJetness::get_bjetness_vars(
   bjetnessFV_num_loosenoipnoiso_leps = num_loosenoipnoiso_eles+num_loose_mus;
 //   bjetnessFV_numjettrksnopv          = num_npvtrks;
   if(jetschtrks.size()!=0){
-    bjetnessFV_pvTrkOVcollTrk        = num_pvtrks/double(jetschtrks.size()); 
+    bjetnessFV_pvTrkOVcollTrk        = num_npvtrks/double(jetschtrks.size()); 
     //Get BJetness Impact Parameters
     double ip_valtemp = 0;
     //3D
